@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduction to Robotics Learning Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #5a67d8;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #5a67d8;
+            box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+        }
+
+        .topic-list {
+            list-style: none;
+        }
+
+        .topic-item {
+            margin-bottom: 8px;
+        }
+
+        .topic-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        .topic-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .topic-button.active {
+            background: linear-gradient(135deg, #4c51bf, #553c9a);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .topic-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .topic-button:hover::before {
+            left: 100%;
+        }
+
+        .topic-emoji {
+            font-size: 18px;
+            margin-right: 10px;
+        }
+
+        .topic-count {
+            margin-left: auto;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .topic-title {
+            color: #5a67d8;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .topic-description {
+            color: #718096;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .questions-container {
+            display: none;
+        }
+
+        .questions-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            margin-bottom: 18px;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .question-header {
+            padding: 22px;
+            cursor: pointer;
+            border-bottom: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .question-header:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+
+        .question-text {
+            font-size: 16px;
+            font-weight: 500;
+            color: #2d3748;
+            line-height: 1.6;
+            padding-right: 30px;
+        }
+
+        .toggle-icon {
+            position: absolute;
+            right: 22px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #5a67d8;
+            transition: transform 0.3s ease;
+        }
+
+        .question-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .question-content.active {
+            max-height: 600px;
+        }
+
+        .answer-section {
+            padding: 25px;
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+        }
+
+        .correct-answer {
+            background: linear-gradient(135deg, #c6f6d5, #9ae6b4);
+            color: #1a202c;
+            padding: 15px 18px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            font-weight: 600;
+            border-left: 4px solid #38a169;
+            box-shadow: 0 2px 8px rgba(56, 161, 105, 0.2);
+        }
+
+        .explanation {
+            background: linear-gradient(135deg, #ebf8ff, #bee3f8);
+            color: #1a202c;
+            padding: 18px;
+            border-radius: 10px;
+            line-height: 1.7;
+            border-left: 4px solid #4299e1;
+            box-shadow: 0 2px 8px rgba(66, 153, 225, 0.2);
+        }
+
+        .explanation-label {
+            font-weight: 600;
+            color: #2c5282;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .no-questions {
+            text-align: center;
+            padding: 50px;
+            color: #718096;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-message h2 {
+            color: #5a67d8;
+            font-size: 36px;
+            margin-bottom: 18px;
+        }
+
+        .welcome-message p {
+            color: #718096;
+            font-size: 18px;
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-results {
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #fed7d7, #feb2b2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .question-card.active .toggle-icon {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+                max-height: 400px;
+            }
+            
+            .main-content {
+                order: 1;
+            }
+
+            .topic-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="header">
+                <h1>🤖 Robotics Hub</h1>
+                <p style="color: #718096; font-size: 14px;">Interactive Learning Journey</p>
+            </div>
+
+            <div class="search-container">
+                <input type="text" class="search-box" placeholder="Search questions..." id="searchBox">
+                <span class="search-icon">🔍</span>
+            </div>
+
+            <ul class="topic-list" id="topicList">
+                <!-- Topics will be populated by JavaScript -->
+            </ul>
+        </div>
+
+        <div class="main-content" id="mainContent">
+            <div class="welcome-message">
+                <h2>Welcome to Robotics Learning Hub! 🚀</h2>
+                <p>Explore the fascinating world of robotics through carefully organized topics. Start with the fundamentals and progress through each section to build your understanding step by step. Each topic builds upon the previous ones, creating a comprehensive learning journey.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const topics = {
+            'fundamentals': {
+                title: '🔧 Fundamental Concepts',
+                description: 'Basic definitions, DOF, workspace, and core robotics principles',
+                questions: [
+                    {
+                        question: "In robotics, what does DOF stand for?",
+                        answer: "B",
+                        explanation: "DOF stands for Degrees of Freedom, which represents the number of independent parameters needed to specify the configuration of a system. For robots, it typically refers to the number of independent joint motions possible."
+                    },
+                    {
+                        question: "What is the workspace of a robot manipulator?",
+                        answer: "B",
+                        explanation: "The workspace is the set of all points in space that can be reached by the robot's end-effector. It's determined by the robot's kinematic structure, joint limits, and link lengths, and is crucial for task planning and robot selection."
+                    },
+                    {
+                        question: "What is the primary purpose of inverse kinematics in robotics?",
+                        answer: "B",
+                        explanation: "Inverse kinematics solves for the joint angles required to position the robot's end-effector at a desired location and orientation. This is fundamental for robot motion planning and control, converting Cartesian space commands to joint space commands."
+                    },
+                    {
+                        question: "What is the difference between forward and inverse kinematics?",
+                        answer: "B",
+                        explanation: "Forward kinematics computes end-effector position and orientation from given joint angles. Inverse kinematics solves for joint angles needed to achieve a desired end-effector pose. Inverse kinematics is generally more complex and may have multiple solutions."
+                    },
+                    {
+                        question: "What is the Jacobian matrix in robotics?",
+                        answer: "B",
+                        explanation: "The Jacobian matrix J(q) linearly relates joint velocities q̇ to end-effector velocity: ẋ = J(q)q̇. It's fundamental for velocity control, force analysis, and singularity analysis. The Jacobian depends on the current configuration q."
+                    },
+                    {
+                        question: "What is the Denavit-Hartenberg (DH) convention used for?",
+                        answer: "B",
+                        explanation: "The DH convention provides a systematic method for assigning coordinate frames to joints in serial manipulators and deriving forward kinematics. It uses four parameters per joint (a, α, d, θ) to completely specify the kinematic structure."
+                    },
+                    {
+                        question: "What is a kinematic singularity in robotics?",
+                        answer: "B",
+                        explanation: "A kinematic singularity occurs when the robot loses one or more degrees of freedom due to specific joint configurations. At singularities, the Jacobian matrix becomes rank-deficient, causing loss of controllability in certain directions."
+                    },
+                    {
+                        question: "What is workspace analysis in robotics?",
+                        answer: "B",
+                        explanation: "Workspace analysis determines the set of all positions and orientations reachable by the robot's end-effector. This includes both the reachable workspace (positions only) and the dexterous workspace (positions with full orientation capability)."
+                    }
+                ]
+            },
+            'dynamics': {
+                title: '⚡ Robot Dynamics',
+                description: 'Lagrangian mechanics, equations of motion, and dynamic modeling',
+                questions: [
+                    {
+                        question: "What does the Euler-Lagrangian framework L = T - V primarily provide?",
+                        answer: "B",
+                        explanation: "The Euler-Lagrangian framework uses the Lagrangian L = T - V (kinetic minus potential energy) to systematically derive equations of motion for mechanical systems. The Euler-Lagrange equation d/dt(∂L/∂q̇) - ∂L/∂q = τ provides a principled way to obtain the governing differential equations."
+                    },
+                    {
+                        question: "In the manipulator equation M(q)q̈ + C(q,q̇)q̇ + G(q) = τ, what does G(q) represent?",
+                        answer: "B",
+                        explanation: "G(q) represents the gravitational forces and torques acting on the system as a function of configuration q. These terms arise from potential energy and must be compensated or exploited depending on the control strategy."
+                    },
+                    {
+                        question: "What is the significance of the Coriolis matrix C(q,q̇) in robot dynamics?",
+                        answer: "B",
+                        explanation: "The Coriolis matrix C(q,q̇) captures velocity-dependent forces that arise from the motion of the robot, including centrifugal and Coriolis effects. These forces depend on both the configuration and velocities and are crucial for accurate dynamic modeling."
+                    },
+                    {
+                        question: "What is the manipulator equation form M(q)q̈ + C(q,q̇)q̇ + G(q) = τ commonly used for?",
+                        answer: "B",
+                        explanation: "This form represents the dynamics of multi-link mechanical systems including robot manipulators. M(q) is the inertia matrix, C(q,q̇) captures Coriolis/centripetal effects, G(q) represents gravity, and τ are the applied torques or forces."
+                    },
+                    {
+                        question: "What property makes the inertia matrix M(q) special in robotic systems?",
+                        answer: "B",
+                        explanation: "The inertia matrix M(q) is always symmetric (Mij = Mji) due to the physics of rotational inertia, and positive definite because kinetic energy T = ½q̇ᵀM(q)q̇ is always positive for non-zero velocities. This ensures the matrix is invertible."
+                    },
+                    {
+                        question: "What is the significance of the Christoffel symbols in robot dynamics?",
+                        answer: "B",
+                        explanation: "Christoffel symbols arise from the differentiation of the kinetic energy expression and define the elements of the Coriolis/centripetal matrix C(q,q̇). They capture how kinetic energy changes with configuration and velocity."
+                    },
+                    {
+                        question: "What is the skew-symmetry property in robot dynamics?",
+                        answer: "B",
+                        explanation: "The important property is that Ṁ(q) - 2C(q,q̇) is skew-symmetric, which is crucial for energy-based analysis and passivity-based control design. This property ensures energy conservation in the absence of external forces and dissipation."
+                    },
+                    {
+                        question: "In the double pendulum equations M(q)q̈ + C(q,q̇)q̇ + G(q) = Bu, what does B represent?",
+                        answer: "B",
+                        explanation: "B is the input matrix that maps the control torques u to the generalized coordinates. For a double pendulum with actuators at both joints, B = I (identity matrix). The structure of B determines which degrees of freedom are directly actuated."
+                    }
+                ]
+            },
+            'actuation': {
+                title: '🎛️ Fully vs Underactuated Systems',
+                description: 'Understanding actuation, control authority, and system classification',
+                questions: [
+                    {
+                        question: "What is the fundamental difference between fully-actuated and underactuated robotic systems?",
+                        answer: "B",
+                        explanation: "Fully-actuated systems have enough actuators to independently control all degrees of freedom, while underactuated systems have fewer actuators than degrees of freedom. This fundamental difference affects control strategies, as underactuated systems cannot follow arbitrary trajectories and must exploit natural dynamics for control."
+                    },
+                    {
+                        question: "In the control-affine form q̈ = f₁(q,q̇,t) + f₂(q,q̇,t)u, what does underactuation mean mathematically?",
+                        answer: "B",
+                        explanation: "Underactuation occurs when rank[f₂(q,q̇,t)] < dim(q), meaning the control input matrix f₂ doesn't have full rank. This indicates there are fewer independent control directions than state dimensions, making the system unable to accelerate in arbitrary directions in the configuration space."
+                    },
+                    {
+                        question: "For a serial robotic manipulator with n joints, the system is by definition:",
+                        answer: "B",
+                        explanation: "A serial robotic manipulator with n joints has n actuators (one per joint) and n degrees of freedom, making it fully-actuated by definition. Each joint can be controlled independently, allowing the manipulator to follow arbitrary trajectories within its workspace."
+                    },
+                    {
+                        question: "What makes walking robots typically underactuated?",
+                        answer: "B",
+                        explanation: "Walking robots are typically underactuated because they have fewer actuators than the total degrees of freedom of the system including the floating base. The robot cannot directly control its position in space but must use ground contact forces and internal joint motions to achieve desired motions."
+                    },
+                    {
+                        question: "For a quadrotor in 2D, how many degrees of freedom and control inputs are there?",
+                        answer: "B",
+                        explanation: "A 2D quadrotor has 3 degrees of freedom (x, y, θ) representing position and orientation, but only 2 control inputs (thrust from two rotors). This makes it underactuated since it cannot independently control all three degrees of freedom simultaneously."
+                    },
+                    {
+                        question: "What is the key challenge in controlling underactuated systems?",
+                        answer: "B",
+                        explanation: "The key challenge is exploiting the state-dependent coupling between actuated and unactuated degrees of freedom. Controllers must reason about how motions in actuated directions can influence unactuated directions through the system's natural dynamics and constraints."
+                    },
+                    {
+                        question: "Why can't underactuated systems follow arbitrary trajectories?",
+                        answer: "B",
+                        explanation: "Underactuated systems have fewer control inputs than degrees of freedom, meaning they cannot accelerate in arbitrary directions in their configuration space. This fundamental limitation prevents them from following arbitrary reference trajectories."
+                    },
+                    {
+                        question: "What does 'exploiting natural dynamics' mean in underactuated robotics?",
+                        answer: "B",
+                        explanation: "Exploiting natural dynamics means designing controllers that work with the system's inherent physics, using natural motions like swinging, ballistic trajectories, or passive stability. This approach often leads to more efficient, elegant motions compared to aggressive trajectory tracking."
+                    }
+                ]
+            },
+            'control-theory': {
+                title: '🎯 Control Theory & Methods',
+                description: 'Feedback linearization, energy-based control, and advanced control strategies',
+                questions: [
+                    {
+                        question: "In feedback linearization, what is the main requirement for a fully-actuated system?",
+                        answer: "B",
+                        explanation: "Feedback linearization requires accurate knowledge of the mass matrix M(q), Coriolis/centripetal matrix C(q,q̇), and gravity vector G(q). The control law u = M(q)v + C(q,q̇)q̇ + G(q) cancels nonlinearities, but parameter uncertainties can lead to poor performance or instability."
+                    },
+                    {
+                        question: "What is the main disadvantage of feedback linearization?",
+                        answer: "B",
+                        explanation: "Feedback linearization is highly sensitive to parameter uncertainties and modeling errors because it relies on exact cancellation of nonlinearities. Small errors in the model can lead to incomplete cancellation, resulting in poor performance or even instability."
+                    },
+                    {
+                        question: "For energy-shaping control of the pendulum at the upright position (θ = π), what does the control law aim to achieve?",
+                        answer: "C",
+                        explanation: "Energy-shaping control designs the control input to modify the system's total energy to a desired value. For stabilizing the upright pendulum, the controller shapes the energy landscape so the upright position becomes a stable equilibrium with the desired energy level."
+                    },
+                    {
+                        question: "What is the primary advantage of energy-based control methods?",
+                        answer: "B",
+                        explanation: "Energy-based control methods provide physical insight by working with fundamental quantities like kinetic and potential energy. This leads to intuitive controller designs that respect the system's natural dynamics and often result in smooth, efficient motions rather than aggressive trajectory tracking."
+                    },
+                    {
+                        question: "What is the concept of computed torque control?",
+                        answer: "B",
+                        explanation: "Computed torque control uses the full dynamic model to compute the torques needed to cancel the robot's natural dynamics and implement a desired linear behavior. It's equivalent to feedback linearization for robotic systems."
+                    },
+                    {
+                        question: "What is partial feedback linearization?",
+                        answer: "D",
+                        explanation: "Partial feedback linearization linearizes only the actuated subsystem dynamics while leaving unactuated dynamics in their original nonlinear form. This approach is used when full feedback linearization is impossible due to underactuation."
+                    },
+                    {
+                        question: "What is the zero dynamics of an underactuated system?",
+                        answer: "B",
+                        explanation: "Zero dynamics represent the internal system behavior when the system output is constrained to identically zero through feedback control. For underactuated systems, the zero dynamics describe how unactuated states evolve when actuated states follow prescribed trajectories."
+                    },
+                    {
+                        question: "What is the basin of attraction for a control system?",
+                        answer: "B",
+                        explanation: "The basin of attraction is the set of initial conditions from which a feedback controller can successfully drive the system to the desired state. For underactuated systems, this basin is typically much smaller than for fully-actuated systems."
+                    }
+                ]
+            },
+            'specific-systems': {
+                title: '🔀 Specific Robotic Systems',
+                description: 'Acrobot, cart-pole, pendulum systems and their unique characteristics',
+                questions: [
+                    {
+                        question: "What makes the simple pendulum equation mℓθ̈ + mgℓsinθ = τ nonlinear?",
+                        answer: "C",
+                        explanation: "The sin(θ) term makes the pendulum equation nonlinear because sine is a nonlinear function of θ. Linear systems have variables and their derivatives appearing only to the first power without products or nonlinear functions. This nonlinearity captures the true physics of large-angle pendulum motion."
+                    },
+                    {
+                        question: "For the acrobot system, which joint is actuated?",
+                        answer: "B",
+                        explanation: "The acrobot has actuation only at the elbow joint, with no actuation at the shoulder. This makes it a classic underactuated system where the controller must use the coupling between joints to control both the shoulder and elbow angles using only the elbow torque."
+                    },
+                    {
+                        question: "What is the defining characteristic of the acrobot system?",
+                        answer: "B",
+                        explanation: "The acrobot has a single actuator at the elbow joint with no actuation at the shoulder. This underactuation forces the controller to exploit dynamic coupling between joints to control the entire system using only the elbow torque."
+                    },
+                    {
+                        question: "In the cart-pole system, which component is directly actuated?",
+                        answer: "B",
+                        explanation: "The cart-pole system has direct actuation of the cart's horizontal position through a force applied to the cart. The pole angle is unactuated and must be controlled indirectly through the cart's acceleration and resulting inertial forces."
+                    },
+                    {
+                        question: "For the cart-pole system, what happens when the cart accelerates to the right?",
+                        answer: "B",
+                        explanation: "When the cart accelerates right, inertial forces cause the pole to tilt left relative to the cart. This coupling between cart acceleration and pole angle is the fundamental mechanism that allows control of the unactuated pole through cart motion."
+                    },
+                    {
+                        question: "What makes the Pendubot different from the Acrobot?",
+                        answer: "B",
+                        explanation: "The Pendubot has actuation at the shoulder joint (first joint) while the acrobot has actuation at the elbow joint (second joint). This difference in actuator placement significantly affects the control challenges and strategies."
+                    },
+                    {
+                        question: "Why is the cart-pole system considered a benchmark for underactuated control?",
+                        answer: "B",
+                        explanation: "The cart-pole captures the fundamental challenge of underactuated systems: using limited control authority to manage multiple degrees of freedom. It's complex enough to be challenging yet simple enough to analyze thoroughly, making it ideal for developing and testing control theories."
+                    },
+                    {
+                        question: "What is the primary control challenge for underactuated systems like the acrobot?",
+                        answer: "B",
+                        explanation: "The key challenge is understanding and exploiting the state-dependent coupling between actuated and unactuated degrees of freedom. Controllers must reason about how actions in actuated directions can influence unactuated directions through the system's natural dynamics."
+                    }
+                ]
+            },
+            'advanced-control': {
+                title: '🚀 Advanced Control Techniques',
+                description: 'Swing-up, energy pumping, trajectory optimization, and specialized methods',
+                questions: [
+                    {
+                        question: "What is swing-up control in the context of underactuated systems?",
+                        answer: "B",
+                        explanation: "Swing-up control brings an underactuated pendulum-like system from its stable downward equilibrium to the unstable upward position. This requires building up energy and exploiting nonlinear dynamics since direct trajectory tracking is impossible."
+                    },
+                    {
+                        question: "In energy-based control of the acrobot, what is the primary control objective during swing-up?",
+                        answer: "B",
+                        explanation: "During swing-up, the controller pumps energy into the system by exploiting the natural pendulum dynamics. The goal is to build up sufficient energy to reach the unstable upright equilibrium where a stabilizing controller can take over."
+                    },
+                    {
+                        question: "What is the spinning-up maneuver in acrobot control?",
+                        answer: "B",
+                        explanation: "The spinning-up maneuver builds energy in the acrobot by rhythmically pumping the actuated elbow joint, similar to how a child pumps their legs on a swing. This energy buildup eventually allows the system to reach the upright configuration."
+                    },
+                    {
+                        question: "What is meant by 'pumping' in underactuated pendulum control?",
+                        answer: "B",
+                        explanation: "Pumping refers to rhythmically adding energy to the system by timing control actions to coincide with natural system motions. Like pumping a swing, energy is added by applying torques at the right phase of the motion cycle."
+                    },
+                    {
+                        question: "What is the difference between local and global control objectives?",
+                        answer: "B",
+                        explanation: "Local control objectives (like balancing at upright position) require the system to start near the goal. Global objectives (like swing-up from any initial condition) must work from a large set of initial conditions, making them much more challenging."
+                    },
+                    {
+                        question: "What is trajectory optimization for underactuated systems?",
+                        answer: "B",
+                        explanation: "Trajectory optimization finds optimal state and control trajectories that satisfy system dynamics, constraints, and performance criteria. For underactuated systems, this is particularly challenging because the feasible trajectory space is restricted by underactuation constraints."
+                    },
+                    {
+                        question: "What is the role of passivity in underactuated robot control?",
+                        answer: "B",
+                        explanation: "Passivity-based control exploits natural energy-dissipation properties of mechanical systems to achieve stability. Passive systems naturally dissipate energy, providing inherent stability properties that can be leveraged in controller design."
+                    },
+                    {
+                        question: "What is the concept of virtual constraints in underactuated robotics?",
+                        answer: "B",
+                        explanation: "Virtual constraints are feedback-imposed relationships between system states that create effective constraints without physical enforcement. They allow coordination of multiple degrees of freedom and can transform underactuated systems into fully-actuated ones on invariant manifolds."
+                    }
+                ]
+            },
+            'phase-analysis': {
+                title: '📊 Phase Analysis & System Behavior',
+                description: 'Phase portraits, orbits, and understanding system dynamics',
+                questions: [
+                    {
+                        question: "What fundamental property must basis vectors satisfy in a vector space?",
+                        answer: "C",
+                        explanation: "Basis vectors must be linearly independent, meaning no vector in the set can be expressed as a linear combination of others. This ensures the basis spans the space efficiently and every vector has a unique representation. Orthogonality is desirable but not required for a basis."
+                    },
+                    {
+                        question: "In the pendulum phase portrait, what do the closed orbits represent?",
+                        answer: "B",
+                        explanation: "Closed orbits in the pendulum phase portrait represent periodic oscillatory motion around the stable downward equilibrium. Each closed curve corresponds to a different energy level, with the pendulum swinging back and forth with that specific total energy."
+                    },
+                    {
+                        question: "What characterizes the homoclinic orbit in the pendulum phase portrait?",
+                        answer: "B",
+                        explanation: "The homoclinic orbit is a trajectory that starts at the unstable upright equilibrium, makes a complete rotation, and returns to the same unstable equilibrium. It represents the separatrix between bounded oscillatory motion and unbounded rotational motion."
+                    },
+                    {
+                        question: "Why is the small-angle approximation sin(θ) ≈ θ used in some control designs?",
+                        answer: "B",
+                        explanation: "The small-angle approximation linearizes the pendulum equation, making it easier to analyze and design controllers using linear control theory. While less accurate for large angles, it provides valuable insights and serves as a starting point for more sophisticated nonlinear designs."
+                    },
+                    {
+                        question: "What is the significance of limit cycles in underactuated systems?",
+                        answer: "B",
+                        explanation: "Limit cycles represent periodic steady-state motions that many underactuated systems naturally exhibit, such as walking gaits, flapping flight, or swimming motions. Designing controllers to create stable limit cycles is a key approach for rhythmic behaviors."
+                    },
+                    {
+                        question: "What happens when holonomic constraints are present in a mechanical system?",
+                        answer: "C",
+                        explanation: "Holonomic constraints reduce the number of degrees of freedom by imposing geometric relationships between coordinates. These constraints can be integrated and eliminate some coordinates, effectively reducing the system's configuration space dimension while maintaining the constraint relationships."
+                    },
+                    {
+                        question: "What is colocation in the context of underactuated robotics?",
+                        answer: "B",
+                        explanation: "Colocation refers to systems where actuators and controlled outputs are at the same location. Collocated systems generally have better controllability properties, while non-collocated systems (like the acrobot) are more challenging to control."
+                    },
+                    {
+                        question: "What is hybrid control in robotics?",
+                        answer: "B",
+                        explanation: "Hybrid control deals with systems having both discrete (switching, contact) and continuous (smooth motion) dynamics. This is essential for walking robots, manipulation with contact, and other systems where discrete events affect continuous evolution."
+                    }
+                ]
+            },
+            'numerical-methods': {
+                title: '💻 Numerical Methods',
+                description: 'ODE solving, simulation techniques, and computational approaches',
+                questions: [
+                    {
+                        question: "What is the primary reason numerical methods are necessary for solving most ODEs in robotics?",
+                        answer: "B",
+                        explanation: "Most robotic systems are governed by nonlinear differential equations that cannot be solved analytically in closed form. Numerical methods provide the only practical way to simulate and analyze these complex dynamical systems for control design and performance evaluation."
+                    },
+                    {
+                        question: "What does the step size h represent in numerical integration methods?",
+                        answer: "B",
+                        explanation: "The step size h is the time increment between successive approximation points in numerical integration. It determines the temporal resolution of the simulation and directly affects both accuracy and computational cost of the numerical solution."
+                    },
+                    {
+                        question: "In Euler's explicit method xi+1 = xi + f(xi)h, what assumption is made about the slope?",
+                        answer: "B",
+                        explanation: "Euler's method assumes the slope f(xi) remains constant over the entire step interval h. This linear extrapolation introduces truncation error because the actual slope typically varies over the interval, making the method first-order accurate."
+                    },
+                    {
+                        question: "What is the local truncation error order for Euler's explicit method?",
+                        answer: "B",
+                        explanation: "Euler's explicit method has local truncation error O(h²), derived from Taylor series expansion where terms of order h² and higher are discarded. However, the global accumulated error over many steps is O(h), making it a first-order method overall."
+                    },
+                    {
+                        question: "Why do implicit methods generally have better stability properties?",
+                        answer: "B",
+                        explanation: "Implicit methods have better stability because the unknown xi+1 appears on both sides of the equation, creating a relationship that naturally damps numerical instabilities. This often allows larger stable step sizes compared to explicit methods, especially for stiff systems."
+                    },
+                    {
+                        question: "What iterative method is commonly used to solve the implicit equations in numerical ODE solving?",
+                        answer: "B",
+                        explanation: "Newton's method is commonly used because it provides quadratic convergence near the solution. For the equation g(y) = 0, it uses yk+1 = yk - g(yk)/g'(yk), making it efficient for solving the nonlinear equations that arise in implicit methods."
+                    },
+                    {
+                        question: "What characterizes a 'stiff' differential equation?",
+                        answer: "B",
+                        explanation: "Stiff equations have solution components that evolve on vastly different time scales - some change rapidly while others change slowly. This forces explicit methods to use extremely small step sizes to maintain stability, even when the overall solution changes slowly."
+                    },
+                    {
+                        question: "How many slope evaluations does the fourth-order Runge-Kutta method require per step?",
+                        answer: "C",
+                        explanation: "RK4 requires four slope evaluations: k₁ at the beginning, k₂ and k₃ at the midpoint (with different estimates), and k₄ at the endpoint. These are combined with weights (1,2,2,1)/6 to achieve fourth-order accuracy."
+                    }
+                ]
+            },
+            'runge-kutta': {
+                title: '🧮 Runge-Kutta Methods',
+                description: 'Advanced numerical integration techniques and their applications',
+                questions: [
+                    {
+                        question: "What is the local truncation error for RK4?",
+                        answer: "C",
+                        explanation: "RK4 has local truncation error O(h⁵), making it extremely accurate for reasonable step sizes. The global error is O(h⁴), which is why it's called a fourth-order method. This high accuracy makes RK4 popular for general-purpose ODE solving."
+                    },
+                    {
+                        question: "In RK4, what is k₂?",
+                        answer: "B",
+                        explanation: "k₂ = hf(ti + h/2, xi + k₁/2) evaluates the slope at the midpoint using k₁ to estimate the midpoint value. This midpoint evaluation captures important behavior within the step interval, contributing significantly to RK4's accuracy."
+                    },
+                    {
+                        question: "Why do k₂ and k₃ receive double weight in the RK4 formula?",
+                        answer: "B",
+                        explanation: "Midpoint information generally provides a better representation of the function's average behavior over an interval than endpoint information. The weights (1,2,2,1) are derived to match the Taylor series to fourth order, with midpoint values receiving double weight for optimal accuracy."
+                    },
+                    {
+                        question: "What is the main advantage of Runge-Kutta methods over Taylor series methods?",
+                        answer: "B",
+                        explanation: "RK methods achieve high-order accuracy without computing higher-order derivatives of f(x,y). They use multiple function evaluations at strategic points instead, making them practical when derivatives are difficult or expensive to compute analytically."
+                    },
+                    {
+                        question: "What makes a numerical method 'self-starting'?",
+                        answer: "B",
+                        explanation: "Self-starting methods like Runge-Kutta only need information from the current point to compute the next point. Unlike multistep methods requiring several previous points, they can begin immediately with just initial conditions."
+                    },
+                    {
+                        question: "What is adaptive step size control?",
+                        answer: "B",
+                        explanation: "Adaptive step size control automatically adjusts h during integration based on local error estimates. It increases h where solutions are smooth (for efficiency) and decreases h where rapid changes occur (for accuracy), optimizing the accuracy-cost balance."
+                    },
+                    {
+                        question: "What are embedded Runge-Kutta methods useful for?",
+                        answer: "B",
+                        explanation: "Embedded RK methods compute solutions of two different orders using the same function evaluations, providing error estimates essentially for free. The difference between orders estimates local error, enabling automatic step size control without additional cost."
+                    },
+                    {
+                        question: "What is the main computational advantage of explicit methods?",
+                        answer: "B",
+                        explanation: "Explicit methods calculate the next value directly from known quantities without requiring iterative solution of equations. This makes them computationally straightforward, though they may have stability restrictions for stiff problems."
+                    }
+                ]
+            },
+            'state-space': {
+                title: '📈 State-Space Methods',
+                description: 'State variables, system representation, and simulation approaches',
+                questions: [
+                    {
+                        question: "For second-order ODEs, how are they typically handled by numerical methods?",
+                        answer: "B",
+                        explanation: "Second-order ODEs are converted to systems of first-order ODEs by introducing state variables. For d²θ/dt² = f(θ, dθ/dt), define x₁ = θ and x₂ = dθ/dt, creating dx₁/dt = x₂ and dx₂/dt = f(x₁, x₂)."
+                    },
+                    {
+                        question: "What does the state vector x represent in state-space form?",
+                        answer: "B",
+                        explanation: "The state vector x contains all information needed to completely describe the system at any time. Given the current state and system dynamics, the future behavior is completely determined. This completeness is fundamental to state-space representation."
+                    },
+                    {
+                        question: "In the damped pendulum state-space form with x₁ = θ, x₂ = θ̇, what is dx₁/dt?",
+                        answer: "A",
+                        explanation: "dx₁/dt = x₂ because x₁ represents angle θ and x₂ represents angular velocity θ̇. By definition of state variables, the rate of change of position equals velocity."
+                    },
+                    {
+                        question: "What is the fundamental trade-off in step size selection?",
+                        answer: "B",
+                        explanation: "Smaller step sizes provide better accuracy but require more computational steps to cover the same time interval. Larger step sizes reduce computational cost but may introduce significant errors or instability. The optimal choice balances accuracy requirements with computational resources."
+                    },
+                    {
+                        question: "When step size is halved in a second-order method, how does the error change?",
+                        answer: "B",
+                        explanation: "For an n-th order method, error is proportional to hⁿ. When h is halved, error reduces by factor of 2ⁿ. For second-order methods, error reduces by factor of 4, though computational cost doubles due to more steps required."
+                    },
+                    {
+                        question: "What causes the 'stiffness' problem in differential equations?",
+                        answer: "B",
+                        explanation: "Stiffness arises when the solution contains components evolving on vastly different time scales. Fast transients require small step sizes for stability in explicit methods, even when the overall solution behavior is dominated by slow dynamics."
+                    },
+                    {
+                        question: "Why are implicit methods preferred for stiff equations?",
+                        answer: "B",
+                        explanation: "Implicit methods can maintain stability with much larger step sizes for stiff systems because the implicit formulation naturally damps numerical instabilities. This stability advantage often outweighs the computational cost of solving implicit equations."
+                    },
+                    {
+                        question: "In practice, what often limits the accuracy of numerical methods?",
+                        answer: "B",
+                        explanation: "Round-off errors from finite precision arithmetic and inaccuracies in function evaluations ultimately limit achievable accuracy. Making step sizes arbitrarily small doesn't improve accuracy indefinitely due to these fundamental limitations."
+                    }
+                ]
+            },
+            'walking-robotics': {
+                title: '🚶 Walking Robotics',
+                description: 'Bipedal locomotion, gait analysis, and walking control strategies',
+                questions: [
+                    {
+                        question: "What is meant by 'dynamic walking' in robotics?",
+                        answer: "B",
+                        explanation: "Dynamic walking exploits the natural pendulum-like dynamics of legs and gravity to achieve efficient locomotion. Rather than fighting natural dynamics, these gaits work with them, often resulting in more energy-efficient walking than static approaches."
+                    },
+                    {
+                        question: "What is the fundamental principle behind passive dynamic walking?",
+                        answer: "B",
+                        explanation: "Passive dynamic walking exploits gravity and the natural pendulum-like dynamics of legs to achieve stable walking gaits without any motors or control systems. These walkers demonstrate that complex walking behavior can emerge from simple mechanical design and natural dynamics."
+                    },
+                    {
+                        question: "What is the Zero Moment Point (ZMP) in walking robotics?",
+                        answer: "B",
+                        explanation: "The ZMP is the point on the ground where the net moment of all forces (gravity, inertial, external) is zero. For stable walking, the ZMP must remain within the support polygon formed by the contact points with the ground."
+                    },
+                    {
+                        question: "What is the difference between static and dynamic walking?",
+                        answer: "B",
+                        explanation: "Static walking maintains static stability at every instant - the center of mass projection always stays within the support polygon. Dynamic walking allows temporary instability, using momentum and dynamic effects to maintain overall stability over the gait cycle."
+                    },
+                    {
+                        question: "What is the capture point in walking robotics?",
+                        answer: "B",
+                        explanation: "The capture point is the point on the ground where the robot would naturally come to rest if it placed its foot there and took no further action. It's a key concept for dynamic balance and step planning in bipedal walking."
+                    },
+                    {
+                        question: "What is the inverted pendulum model used for in walking?",
+                        answer: "B",
+                        explanation: "The inverted pendulum model simplifies the complex multi-body dynamics of walking to a point mass at the center of mass connected by a massless leg to the ground. Despite its simplicity, it captures essential walking dynamics and is widely used for gait analysis and control design."
+                    },
+                    {
+                        question: "What is the compass gait model?",
+                        answer: "B",
+                        explanation: "The compass gait is the simplest walking model consisting of two rigid legs connected at a hip joint. It demonstrates that stable walking gaits can emerge from simple mechanical systems and serves as a fundamental model for understanding walking dynamics."
+                    },
+                    {
+                        question: "What is ground reaction force in walking?",
+                        answer: "B",
+                        explanation: "Ground reaction force is the force that the ground applies to the robot in response to the robot's interaction with the surface. This force, governed by Newton's third law, provides the support and propulsion necessary for walking."
+                    }
+                ]
+            },
+            'gait-analysis': {
+                title: '👣 Gait Analysis & Control',
+                description: 'Walking patterns, stability, and locomotion optimization',
+                questions: [
+                    {
+                        question: "What is foot placement strategy in walking control?",
+                        answer: "B",
+                        explanation: "Foot placement strategy determines where to place the swing leg foot to maintain balance and achieve desired walking behavior. This is a fundamental control problem in bipedal walking, affecting both stability and energy efficiency."
+                    },
+                    {
+                        question: "What is the concept of limit cycles in walking?",
+                        answer: "B",
+                        explanation: "Limit cycles in walking represent periodic steady-state gait patterns that the robot naturally converges to. A stable limit cycle means the robot will return to its normal walking pattern after small disturbances, providing robust locomotion."
+                    },
+                    {
+                        question: "What is the double support phase in walking?",
+                        answer: "B",
+                        explanation: "The double support phase occurs when both legs are simultaneously in contact with the ground during walking. This phase provides stability during weight transfer from one leg to the other and distinguishes walking from running."
+                    },
+                    {
+                        question: "What is the swing phase in walking?",
+                        answer: "B",
+                        explanation: "The swing phase is the portion of the gait cycle when a leg is not in contact with the ground and swings forward to the next step location. During this phase, the leg behaves approximately like a compound pendulum."
+                    },
+                    {
+                        question: "What is gait optimization in walking robotics?",
+                        answer: "B",
+                        explanation: "Gait optimization seeks optimal gait parameters (step length, frequency, joint trajectories) to minimize energy consumption, maximize stability, or achieve other performance objectives. It's essential for developing efficient and robust walking gaits."
+                    },
+                    {
+                        question: "What is the spring-loaded inverted pendulum (SLIP) model?",
+                        answer: "B",
+                        explanation: "The SLIP model represents the center of mass dynamics during locomotion using a point mass connected to the ground by a massless spring leg. It successfully captures the key dynamics of both walking and running across many species and robots."
+                    },
+                    {
+                        question: "What is compliance in walking robot legs?",
+                        answer: "B",
+                        explanation: "Compliance in robot legs provides mechanical flexibility that helps absorb impact forces during ground contact and adapt to irregular terrain. This passive compliance can improve stability and reduce control complexity compared to purely rigid systems."
+                    },
+                    {
+                        question: "What is the concept of dynamic stability in walking?",
+                        answer: "B",
+                        explanation: "Dynamic stability in walking means that stability is maintained through the dynamics of motion rather than static equilibrium. The system may be instantaneously unstable but remains stable over the complete gait cycle through proper momentum management."
+                    }
+                ]
+            },
+            'advanced-walking': {
+                title: '⚡ Advanced Walking Concepts',
+                description: 'Terrain adaptation, balance recovery, and sophisticated walking strategies',
+                questions: [
+                    {
+                        question: "What is terrain adaptation in walking robotics?",
+                        answer: "B",
+                        explanation: "Terrain adaptation refers to the robot's ability to successfully walk on various surfaces, slopes, and irregular terrain by adjusting gait parameters, foot placement, and body posture. This is crucial for real-world deployment of walking robots."
+                    },
+                    {
+                        question: "What is the center of pressure (COP)?",
+                        answer: "B",
+                        explanation: "The center of pressure is the point where the resultant of the pressure distribution under the foot acts. It's the effective location of the ground reaction force and is crucial for balance analysis and control in walking robots."
+                    },
+                    {
+                        question: "What is ankle compliance in walking robots?",
+                        answer: "B",
+                        explanation: "Ankle compliance provides mechanical flexibility at the ankle joint, allowing passive adaptation to ground irregularities and slope variations. This compliance can significantly improve walking stability and reduce the computational burden on active control systems."
+                    },
+                    {
+                        question: "What is the role of the upper body in walking?",
+                        answer: "B",
+                        explanation: "The upper body, including arms and torso, plays important roles in counterbalancing leg motions and managing angular momentum during walking. Proper upper body motion can significantly improve walking efficiency and stability."
+                    },
+                    {
+                        question: "What is push recovery in walking robotics?",
+                        answer: "B",
+                        explanation: "Push recovery refers to control strategies that help the robot regain balance and continue walking after experiencing large disturbances like pushes or impacts. These strategies often involve rapid stepping or changes in gait parameters."
+                    },
+                    {
+                        question: "What is the metabolic cost of transport in walking?",
+                        answer: "B",
+                        explanation: "The metabolic cost of transport measures the energy required per unit distance traveled, typically normalized by body weight. It's a key metric for evaluating and comparing the efficiency of different walking strategies and robot designs."
+                    },
+                    {
+                        question: "What is gait phase detection in walking?",
+                        answer: "B",
+                        explanation: "Gait phase detection identifies the current phase within the gait cycle (heel strike, stance, toe-off, swing, etc.). This information is crucial for timing control actions and coordinating different aspects of the walking motion."
+                    },
+                    {
+                        question: "What is foot-ground contact modeling?",
+                        answer: "B",
+                        explanation: "Foot-ground contact modeling develops mathematical representations of the complex forces, torques, and constraints that arise during foot-ground interaction. These models are essential for accurate walking simulation and control design."
+                    }
+                ]
+            },
+            'advanced-locomotion': {
+                title: '🎪 Advanced Locomotion & Control',
+                description: 'Sophisticated control strategies and whole-body motion planning',
+                questions: [
+                    {
+                        question: "What is the concept of virtual model control in walking?",
+                        answer: "B",
+                        explanation: "Virtual model control creates virtual mechanical components (springs, dampers, actuators) between robot parts and uses them to generate desired forces and torques. This approach provides intuitive control design and can create compliant, natural-looking motions."
+                    },
+                    {
+                        question: "What is whole-body motion planning for humanoid robots?",
+                        answer: "B",
+                        explanation: "Whole-body motion planning coordinates the motion of all robot joints and body segments to achieve complex tasks while maintaining balance, avoiding obstacles, and satisfying various constraints. It's essential for humanoid robots performing complex manipulation or locomotion tasks."
+                    },
+                    {
+                        question: "What is impedance control in robotics?",
+                        answer: "B",
+                        explanation: "Impedance control regulates the dynamic relationship between forces and motions, allowing specification of desired mechanical impedance (mass-spring-damper) characteristics. This is particularly useful for interaction tasks and compliant manipulation."
+                    },
+                    {
+                        question: "What is force control in robotics?",
+                        answer: "B",
+                        explanation: "Force control regulates the forces and torques that the robot exerts on its environment during contact tasks. This is essential for assembly, polishing, and other interaction tasks where force levels are critical for task success."
+                    },
+                    {
+                        question: "What is hybrid position/force control?",
+                        answer: "B",
+                        explanation: "Hybrid position/force control simultaneously regulates position in some directions and force in orthogonal directions. This is natural for many manipulation tasks where precise positioning is needed in some directions while maintaining contact forces in others."
+                    },
+                    {
+                        question: "What is admittance control?",
+                        answer: "B",
+                        explanation: "Admittance control regulates how the robot moves in response to applied forces, implementing a desired dynamic relationship between forces and motions. It's the dual of impedance control and is often easier to implement on position-controlled robots."
+                    },
+                    {
+                        question: "What is the concept of operational space control?",
+                        answer: "B",
+                        explanation: "Operational space control (OSC) directly controls the end-effector's motion in Cartesian space rather than in joint space. It uses the manipulator dynamics to achieve desired accelerations in operational (task) space while handling the mapping between joint and operational spaces."
+                    },
+                    {
+                        question: "What is redundancy resolution in robotics?",
+                        answer: "B",
+                        explanation: "Redundancy resolution addresses how to choose joint motions when a redundant manipulator has more degrees of freedom than needed for a task. Multiple joint configurations can achieve the same end-effector pose, and optimization criteria are used to select among them."
+                    }
+                ]
+            },
+            'manipulation': {
+                title: '✋ Robotic Manipulation',
+                description: 'Grasping, manipulation strategies, and end-effector control',
+                questions: [
+                    {
+                        question: "What is the primary function of a robot gripper?",
+                        answer: "B",
+                        explanation: "A robot gripper is the end-effector designed to grasp, hold, and manipulate objects. It's the robot's 'hand' and can take various forms from simple parallel-jaw grippers to complex multi-fingered hands with multiple degrees of freedom."
+                    },
+                    {
+                        question: "What is the difference between precision and power grasps?",
+                        answer: "B",
+                        explanation: "Precision grasps use fingertips for fine manipulation of small objects with high dexterity but low force. Power grasps involve the palm and multiple finger segments to securely hold larger objects with high force but limited dexterity."
+                    },
+                    {
+                        question: "What is form closure in robotic grasping?",
+                        answer: "B",
+                        explanation: "Form closure occurs when the geometric constraints imposed by contact points completely constrain an object's motion, preventing movement in any direction without breaking contact. It provides secure grasping through geometry alone, independent of friction."
+                    },
+                    {
+                        question: "What is force closure in robotic grasping?",
+                        answer: "B",
+                        explanation: "Force closure means the contact forces at grasp points can generate wrenches (forces and torques) to balance any external disturbance forces. This requires both appropriate contact geometry and sufficient friction to maintain stable grasping."
+                    },
+                    {
+                        question: "What is the grasp matrix in robotics?",
+                        answer: "A",
+                        explanation: "The grasp matrix mathematically represents how forces applied at contact points map to resultant forces and torques on the grasped object. It's fundamental for analyzing grasp quality and planning manipulation actions."
+                    },
+                    {
+                        question: "What is grasp quality metrics used for?",
+                        answer: "B",
+                        explanation: "Grasp quality metrics quantify how well a particular grasp configuration can resist external disturbances. Common metrics include the minimum wrench that can break the grasp or the maximum disturbance the grasp can withstand."
+                    },
+                    {
+                        question: "What is dexterous manipulation?",
+                        answer: "B",
+                        explanation: "Dexterous manipulation involves skillfully manipulating objects within the hand or between fingers, similar to human dexterity. This includes re-orienting objects, adjusting grip, and performing complex manipulation tasks without releasing the object."
+                    },
+                    {
+                        question: "What is the role of tactile sensing in manipulation?",
+                        answer: "B",
+                        explanation: "Tactile sensing provides crucial touch, force, and texture information during manipulation tasks. It enables detection of contact, slip, object properties, and grasp stability, allowing for reactive control and adaptation during manipulation."
+                    }
+                ]
+            },
+            'advanced-manipulation': {
+                title: '🎯 Advanced Manipulation',
+                description: 'Visual servoing, compliance, contact modeling, and sophisticated manipulation techniques',
+                questions: [
+                    {
+                        question: "What is visual servoing in robotic manipulation?",
+                        answer: "B",
+                        explanation: "Visual servoing uses real-time visual feedback to control robot motion, directly incorporating image information into the control loop. It enables precise manipulation even with uncertain object positions and can adapt to visual changes during task execution."
+                    },
+                    {
+                        question: "What is impedance control in manipulation?",
+                        answer: "B",
+                        explanation: "Impedance control regulates the dynamic relationship between contact forces and resulting motions during manipulation. It allows specification of desired mechanical impedance (mass-spring-damper) characteristics, enabling compliant interaction with objects and environments."
+                    },
+                    {
+                        question: "What is compliance in robotic manipulation?",
+                        answer: "B",
+                        explanation: "Compliance provides mechanical flexibility that allows the robot to respond appropriately to contact forces during manipulation. This flexibility enables safe interaction, accommodation of uncertainties, and improved performance in contact-rich tasks like assembly."
+                    },
+                    {
+                        question: "What is the difference between active and passive compliance?",
+                        answer: "B",
+                        explanation: "Active compliance uses sensors and control systems to adjust robot behavior in response to forces. Passive compliance uses mechanical design (springs, flexible materials) to provide inherent flexibility without requiring sensors or control computation."
+                    },
+                    {
+                        question: "What is contact modeling in manipulation?",
+                        answer: "B",
+                        explanation: "Contact modeling develops mathematical representations of the complex physical interactions that occur when robot and object surfaces come into contact. These models predict contact forces, constraints, and dynamics essential for manipulation planning and control."
+                    },
+                    {
+                        question: "What is sliding friction in manipulation?",
+                        answer: "B",
+                        explanation: "Sliding friction is the friction force that opposes relative motion between contacting surfaces. Understanding and modeling sliding friction is crucial for grasp analysis, predicting slip conditions, and designing manipulation strategies that maintain stable contact."
+                    },
+                    {
+                        question: "What is the concept of null space in robotics?",
+                        answer: "B",
+                        explanation: "The null space contains joint motions that don't affect the end-effector pose. For redundant manipulators, null space motions can be used for secondary objectives like obstacle avoidance or singularity avoidance while maintaining the primary task."
+                    },
+                    {
+                        question: "What is trajectory planning in robotics?",
+                        answer: "B",
+                        explanation: "Trajectory planning determines the desired time evolution of position, velocity, and acceleration profiles that the robot should follow to move from start to goal configurations. It considers kinematic/dynamic constraints and optimization criteria."
+                    }
+                ]
+            },
+            'emerging-concepts': {
+                title: '🌟 Emerging Concepts',
+                description: 'Human-robot interaction, swarm robotics, and advanced applications',
+                questions: [
+                    {
+                        question: "What is motion primitives in robotics?",
+                        answer: "B",
+                        explanation: "Motion primitives are elementary motion patterns or behaviors that can be combined to create complex motions. Examples include reaching, grasping, and walking steps. They provide building blocks for composing sophisticated robot behaviors."
+                    },
+                    {
+                        question: "What is dynamic manipulation?",
+                        answer: "B",
+                        explanation: "Dynamic manipulation exploits the natural dynamics of both the robot and manipulated objects to achieve tasks that would be impossible with quasi-static approaches. Examples include juggling, throwing, and catching operations."
+                    },
+                    {
+                        question: "What is the concept of virtual fixtures in robotics?",
+                        answer: "B",
+                        explanation: "Virtual fixtures provide guidance constraints that assist human operators or autonomous systems in performing tasks. They can enforce geometric constraints, forbidden regions, or preferred motion patterns, effectively creating virtual walls or guides in task space."
+                    },
+                    {
+                        question: "What is shared control in robotics?",
+                        answer: "B",
+                        explanation: "Shared control involves human operators and autonomous systems sharing control authority. The robot provides assistance while the human retains high-level decision making. The allocation of control can be dynamic based on context and operator skill."
+                    },
+                    {
+                        question: "What is teleoperation in robotics?",
+                        answer: "B",
+                        explanation: "Teleoperation enables human operators to control robots remotely, often with haptic feedback. It's essential for dangerous environments, space applications, and microsurgery where direct human presence is impossible or undesirable."
+                    },
+                    {
+                        question: "What is haptic feedback in robotics?",
+                        answer: "B",
+                        explanation: "Haptic feedback provides force, tactile, or kinesthetic information to human operators during teleoperation or interaction. It enables operators to 'feel' what the robot is experiencing, improving manipulation performance and safety."
+                    },
+                    {
+                        question: "What is swarm robotics?",
+                        answer: "B",
+                        explanation: "Swarm robotics studies coordination of multiple simple robots that work together to accomplish tasks beyond individual capabilities. Inspired by biological swarms, it emphasizes decentralized control, local communication, and emergent collective behaviors."
+                    },
+                    {
+                        question: "What is the concept of manipulation primitives?",
+                        answer: "B",
+                        explanation: "Manipulation primitives are elementary manipulation actions like grasping, lifting, placing, and pushing that can be combined to create complex manipulation behaviors. They provide a modular approach to building sophisticated manipulation skills."
+                    }
+                ]
+            }
+        };
+
+        let currentTopic = '';
+        let allQuestions = [];
+        let questionCounter = 0;
+
+        // Flatten all questions for search
+        Object.keys(topics).forEach(topicKey => {
+            topics[topicKey].questions.forEach(q => {
+                questionCounter++;
+                allQuestions.push({...q, topic: topicKey, topicTitle: topics[topicKey].title, id: questionCounter});
+            });
+        });
+
+        // Render topics in sidebar
+        function renderTopics() {
+            const topicList = document.getElementById('topicList');
+            topicList.innerHTML = '';
+            
+            Object.keys(topics).forEach(topicKey => {
+                const topic = topics[topicKey];
+                const li = document.createElement('li');
+                li.className = 'topic-item';
+                li.innerHTML = `
+                    <button class="topic-button" data-topic="${topicKey}">
+                        <span class="topic-text">${topic.title}</span>
+                        <span class="topic-count">${topic.questions.length}</span>
+                    </button>
+                `;
+                topicList.appendChild(li);
+            });
+
+            // Add event listeners
+            document.querySelectorAll('.topic-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const topicKey = button.getAttribute('data-topic');
+                    showTopic(topicKey);
+                });
+            });
+        }
+
+        // Show questions for a specific topic
+        function showTopic(topicKey) {
+            currentTopic = topicKey;
+            const topic = topics[topicKey];
+            
+            // Update active topic
+            document.querySelectorAll('.topic-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-topic="${topicKey}"]`).classList.add('active');
+            
+            // Update header
+            const mainContent = document.getElementById('mainContent');
+            mainContent.innerHTML = `
+                <div class="content-header">
+                    <h2 class="topic-title">${topic.title}</h2>
+                    <p class="topic-description">${topic.description}</p>
+                </div>
+                <div class="questions-container active">
+                    ${renderQuestions(topic.questions)}
+                </div>
+            `;
+
+            // Add click handlers for questions
+            addQuestionHandlers();
+        }
+
+        // Render questions
+        function renderQuestions(questions) {
+            if (questions.length === 0) {
+                return '<div class="no-questions">No questions found matching your search.</div>';
+            }
+            
+            return questions.map((q, index) => `
+                <div class="question-card" data-question-id="${q.id || index}">
+                    <div class="question-header">
+                        <div class="question-number">Question ${q.id || index + 1}</div>
+                        <div class="question-text">${q.question}</div>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="question-content">
+                        <div class="answer-section">
+                            <div class="correct-answer">
+                                <strong>Correct Answer:</strong> ${q.answer}
+                            </div>
+                            <div class="explanation">
+                                <span class="explanation-label">Explanation:</span>
+                                ${q.explanation}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Add question click handlers
+        function addQuestionHandlers() {
+            document.querySelectorAll('.question-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const card = header.closest('.question-card');
+                    const content = card.querySelector('.question-content');
+                    
+                    card.classList.toggle('active');
+                    content.classList.toggle('active');
+                });
+            });
+        }
+
+        // Search functionality
+        function setupSearch() {
+            const searchBox = document.getElementById('searchBox');
+            searchBox.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                
+                if (query === '') {
+                    if (currentTopic) {
+                        showTopic(currentTopic);
+                    } else {
+                        showWelcome();
+                    }
+                    return;
+                }
+                
+                const filteredQuestions = allQuestions.filter(q => 
+                    q.question.toLowerCase().includes(query) ||
+                    q.explanation.toLowerCase().includes(query) ||
+                    q.topicTitle.toLowerCase().includes(query)
+                );
+                
+                // Show search results
+                const mainContent = document.getElementById('mainContent');
+                mainContent.innerHTML = `
+                    <div class="content-header">
+                        <h2 class="topic-title">Search Results</h2>
+                        <p class="topic-description">Found ${filteredQuestions.length} questions matching "${query}"</p>
+                    </div>
+                    <div class="questions-container active">
+                        ${renderQuestions(filteredQuestions.map(q => ({
+                            ...q,
+                            question: highlightText(q.question, query),
+                            explanation: highlightText(q.explanation, query)
+                        })))}
+                    </div>
+                `;
+                
+                addQuestionHandlers();
+            });
+        }
+
+        // Highlight search terms
+        function highlightText(text, query) {
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        // Show welcome message
+        function showWelcome() {
+            const mainContent = document.getElementById('mainContent');
+            mainContent.innerHTML = `
+                <div class="welcome-message">
+                    <h2>Welcome to Robotics Learning Hub! 🚀</h2>
+                    <p>Explore the fascinating world of robotics through carefully organized topics. Start with the fundamentals and progress through each section to build your understanding step by step. Each topic builds upon the previous ones, creating a comprehensive learning journey.</p>
+                </div>
+            `;
+            currentTopic = '';
+            document.querySelectorAll('.topic-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+        }
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTopics();
+            setupSearch();
+        });
+    </script>
+</body>
+</html>
